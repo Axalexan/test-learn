@@ -1,0 +1,56 @@
+close all
+clear variables
+spectra = importdata("spectra.csv")
+lambdaStart = importdata("lambda_start.csv")
+lambdaDelta = importdata("lambda_delta.csv")
+starNames = importdata("star_names.csv")
+
+
+sped_of_light = 299792.458
+
+nObs = size(spectra, 1)
+nSts = size(spectra, 2)
+lambdaEnd = lambdaStart + (nObs-1) * lambdaDelta
+lambda = (lambdaStart : lambdaDelta : lambdaEnd)'
+
+
+i=1;
+mint = (1 : 1 : nSts);
+midx = (1 : 1 : nSts);
+
+while i<=nSts
+    [ mint( 1,i ), midx(1,i) ] = min(spectra(:,i));
+    i = i+1;
+end
+
+
+i=1
+speed = (1 : 1 : nSts)'
+while i<=nSts
+    speed(i,1) = ((lambda(midx(i))/656.28)-1)*sped_of_light
+    i=i+1;
+end
+
+fg1 = figure
+j=1
+i=1
+for i=1:1:nSts 
+    if speed(i)>0
+        plot(lambda,spectra(:,i),"-",'LineWidth',3,"Color",[rand(1) rand(1) rand(1)])
+    else
+        plot(lambda,spectra(:,i),"--",'LineWidth',1,"Color",[rand(1) rand(1) rand(1)])
+        moveaway(j) = starNames(i)
+        j=j+1
+    end
+    i=i+1
+    hold on
+end
+moveaway
+grid on
+xlabel('Длина волны, нм')
+ylabel(['Интенсивность излучения, эрг/см^2/c/', char(197)])
+title('Спектры звезд')
+legend(starNames)
+text(635,2.25*10^(-13),'Шарапов Алексей Б04-006')
+set(fg1, 'Visible',"on")
+saveas(fg1, 'spectaplot.png')
